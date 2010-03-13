@@ -19,6 +19,8 @@ package com.g414.avro.jackson;
 
 import java.io.IOException;
 
+import org.apache.avro.Schema.Field;
+import org.apache.avro.generic.GenericData.Record;
 import org.apache.avro.util.Utf8;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonProcessingException;
@@ -31,6 +33,7 @@ public class AvroObjectMapper {
 	public static ObjectMapper getObjectMapper() {
 		CustomSerializerFactory f = new CustomSerializerFactory();
 		f.addSpecificMapping(Utf8.class, new Utf8Serializer());
+		f.addSpecificMapping(Record.class, new RecordSerializer());
 
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.setSerializerFactory(f);
@@ -44,6 +47,26 @@ public class AvroObjectMapper {
 				SerializerProvider provider) throws IOException,
 				JsonProcessingException {
 			jgen.writeString(value.toString());
+		}
+	}
+
+	public static class RecordSerializer extends JsonSerializer<Record> {
+		@Override
+		public void serialize(Record record, JsonGenerator jgen,
+				SerializerProvider provider) throws IOException,
+				JsonProcessingException {
+			jgen.writeStartObject();
+			for (Field field : record.getSchema().getFields()) {
+				String fieldName = field.name();
+
+				Object value = record.get(fieldName);
+				if (value != null && value instanceof Utf8) {
+					jgen.writeObjectField(fieldName, value.toString());
+				} else {
+					jgen.writeObjectField(fieldName, value);
+				}
+			}
+			jgen.writeEndObject();
 		}
 	}
 }

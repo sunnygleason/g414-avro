@@ -19,7 +19,9 @@ package com.g414.avro.process;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumReader;
@@ -62,9 +64,14 @@ public class RecordProcessor<D extends GenericRecord> {
 			handler.start();
 
 			for (String fname : files) {
+				InputStream input = new FileInputStream(fname);
+				if (fname.endsWith(".gz")) {
+					input = new GZIPInputStream(input);
+				}
+
 				SequentialDataReader<GenericRecord> reader = new SequentialDataReader<GenericRecord>(
-						schema, new FileInputStream(fname),
-						new GenericDatumReader<GenericRecord>(schema));
+						schema, input, new GenericDatumReader<GenericRecord>(
+								schema));
 				processImpl(reader);
 			}
 
@@ -95,8 +102,8 @@ public class RecordProcessor<D extends GenericRecord> {
 		while (reader.next(record) != null) {
 			if (handler != null && (filter == null || filter.matches(record))) {
 				handler.handle(record);
+				record = new Record(schema);
 			}
-			record.clear();
 		}
 	}
 }

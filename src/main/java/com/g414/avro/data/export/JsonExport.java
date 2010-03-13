@@ -20,9 +20,11 @@ package com.g414.avro.data.export;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumReader;
@@ -49,12 +51,17 @@ public class JsonExport {
 
 		for (String file : theArgs) {
 			try {
+				InputStream input = new FileInputStream(file);
+				if (file.endsWith(".gz")) {
+					input = new GZIPInputStream(input);
+				}
+
 				PrintWriter writer = new PrintWriter(file + ".out.json");
 				RecordProcessor<GenericRecord> processor = new RecordProcessor<GenericRecord>(
 						schema, null, new JsonWriter(writer));
 				processor.process(new SequentialDataReader<GenericRecord>(
-						schema, new FileInputStream(file),
-						new GenericDatumReader<GenericRecord>(schema)));
+						schema, input, new GenericDatumReader<GenericRecord>(
+								schema)));
 				// close file...
 			} catch (Exception e) {
 				e.printStackTrace();

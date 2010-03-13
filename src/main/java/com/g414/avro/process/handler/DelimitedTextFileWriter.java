@@ -18,7 +18,6 @@
 package com.g414.avro.process.handler;
 
 import java.io.PrintWriter;
-import java.util.Map;
 
 import org.apache.avro.generic.GenericRecord;
 
@@ -52,12 +51,16 @@ public class DelimitedTextFileWriter implements RecordHandler {
 	/** @see DelimitedTextFileWriter#handle(GenericRecord) */
 	@Override
 	public void handle(GenericRecord record) throws ProcessingException {
+		int size = record.getSchema().getFields().size();
+
 		StringBuilder builder = new StringBuilder();
-		for (Map.Entry<String, Object> entry : record.entrySet()) {
+
+		for (int i = 0; i < size; i++) {
 			builder.append(delim);
-			builder.append(entry.getValue().toString());
+			builder.append(record.get(i).toString());
 		}
-		String outStr = record.size() > 0 ? builder.substring(1) : "";
+
+		String outStr = (size > 0) ? builder.substring(1) : "";
 		writer.println(outStr);
 	}
 

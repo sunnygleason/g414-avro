@@ -38,8 +38,13 @@ public class IdentityTranslation implements RecordTranslation {
 	/** @see RecordTranslation#translate() */
 	@Override
 	public GenericRecord translate(GenericRecord in) {
+		int size = in.getSchema().getFields().size();
+
 		Record record = new Record(schema);
-		record.putAll(in);
+
+		for (int i = 0; i < size; i++) {
+			record.put(i, in.get(i));
+		}
 
 		return record;
 	}
