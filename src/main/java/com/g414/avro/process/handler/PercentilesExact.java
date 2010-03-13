@@ -38,70 +38,70 @@ import com.g414.avro.process.RecordHandler;
  * memory rather than collecting all values.
  */
 public class PercentilesExact<T extends Comparable<T>> implements RecordHandler {
-	/** field to examine */
-	protected final String field;
+    /** field to examine */
+    protected final String field;
 
-	/** whether sort should be by ascending or descending order */
-	protected final boolean isAscending;
+    /** whether sort should be by ascending or descending order */
+    protected final boolean isAscending;
 
-	/** values collected while processing */
-	protected List<T> values = Collections.synchronizedList(new ArrayList<T>());
+    /** values collected while processing */
+    protected List<T> values = Collections.synchronizedList(new ArrayList<T>());
 
-	/**
-	 * Construct a new instance that examines the given field and is ready to
-	 * return percentiles based on sorting ascending or descending.
-	 */
-	public PercentilesExact(String field, boolean isAscending) {
-		this.field = field;
-		this.isAscending = isAscending;
-	}
+    /**
+     * Construct a new instance that examines the given field and is ready to
+     * return percentiles based on sorting ascending or descending.
+     */
+    public PercentilesExact(String field, boolean isAscending) {
+        this.field = field;
+        this.isAscending = isAscending;
+    }
 
-	/** @see RecordHandler#start() */
-	@Override
-	public void start() {
-	}
+    /** @see RecordHandler#start() */
+    @Override
+    public void start() {
+    }
 
-	/** @see RecordHandler#handle(GenericRecord) */
-	@Override
-	@SuppressWarnings("unchecked")
-	public void handle(GenericRecord record) throws ProcessingException {
-		T value = (T) record.get(field);
-		values.add(value);
-	}
+    /** @see RecordHandler#handle(GenericRecord) */
+    @Override
+    @SuppressWarnings("unchecked")
+    public void handle(GenericRecord record) throws ProcessingException {
+        T value = (T) record.get(field);
+        values.add(value);
+    }
 
-	/** @see RecordHandler#finish() */
-	@Override
-	public void finish() {
-	}
+    /** @see RecordHandler#finish() */
+    @Override
+    public void finish() {
+    }
 
-	/**
-	 * Returns a map of BigDecimal percentiles to corresponding values seen in
-	 * input. Uses BigDecimals to avoid rounding error of desired percentiles.
-	 */
-	public synchronized Map<BigDecimal, T> getPercentiles(
-			List<BigDecimal> percentiles) {
-		Collections.sort(values, new Comparator<T>() {
-			public int compare(T o1, T o2) {
-				int cmp = o1.compareTo(o2);
-				return isAscending ? cmp : -cmp;
-			};
-		});
+    /**
+     * Returns a map of BigDecimal percentiles to corresponding values seen in
+     * input. Uses BigDecimals to avoid rounding error of desired percentiles.
+     */
+    public synchronized Map<BigDecimal, T> getPercentiles(
+            List<BigDecimal> percentiles) {
+        Collections.sort(values, new Comparator<T>() {
+            public int compare(T o1, T o2) {
+                int cmp = o1.compareTo(o2);
+                return isAscending ? cmp : -cmp;
+            };
+        });
 
-		BigDecimal size = new BigDecimal(values.size());
+        BigDecimal size = new BigDecimal(values.size());
 
-		Map<BigDecimal, T> outList = new LinkedHashMap<BigDecimal, T>();
-		for (BigDecimal percentile : percentiles) {
-			if (percentile.compareTo(BigDecimal.ZERO) < 0
-					|| percentile.compareTo(BigDecimal.ONE) > 0) {
-				throw new IllegalArgumentException(
-						"percentile must be between 0 and 1, inclusive: got "
-								+ percentile);
-			}
+        Map<BigDecimal, T> outList = new LinkedHashMap<BigDecimal, T>();
+        for (BigDecimal percentile : percentiles) {
+            if (percentile.compareTo(BigDecimal.ZERO) < 0
+                    || percentile.compareTo(BigDecimal.ONE) > 0) {
+                throw new IllegalArgumentException(
+                        "percentile must be between 0 and 1, inclusive: got "
+                                + percentile);
+            }
 
-			int index = percentile.multiply(size).intValue();
-			outList.put(percentile, values.get(index));
-		}
+            int index = percentile.multiply(size).intValue();
+            outList.put(percentile, values.get(index));
+        }
 
-		return Collections.unmodifiableMap(outList);
-	}
+        return Collections.unmodifiableMap(outList);
+    }
 }

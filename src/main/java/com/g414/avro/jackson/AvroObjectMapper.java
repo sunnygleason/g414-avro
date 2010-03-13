@@ -30,43 +30,43 @@ import org.codehaus.jackson.map.SerializerProvider;
 import org.codehaus.jackson.map.ser.CustomSerializerFactory;
 
 public class AvroObjectMapper {
-	public static ObjectMapper getObjectMapper() {
-		CustomSerializerFactory f = new CustomSerializerFactory();
-		f.addSpecificMapping(Utf8.class, new Utf8Serializer());
-		f.addSpecificMapping(Record.class, new RecordSerializer());
+    public static ObjectMapper getObjectMapper() {
+        CustomSerializerFactory f = new CustomSerializerFactory();
+        f.addSpecificMapping(Utf8.class, new Utf8Serializer());
+        f.addSpecificMapping(Record.class, new RecordSerializer());
 
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.setSerializerFactory(f);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializerFactory(f);
 
-		return mapper;
-	}
+        return mapper;
+    }
 
-	public static class Utf8Serializer extends JsonSerializer<Utf8> {
-		@Override
-		public void serialize(Utf8 value, JsonGenerator jgen,
-				SerializerProvider provider) throws IOException,
-				JsonProcessingException {
-			jgen.writeString(value.toString());
-		}
-	}
+    public static class Utf8Serializer extends JsonSerializer<Utf8> {
+        @Override
+        public void serialize(Utf8 value, JsonGenerator jgen,
+                SerializerProvider provider) throws IOException,
+                JsonProcessingException {
+            jgen.writeString(value.toString());
+        }
+    }
 
-	public static class RecordSerializer extends JsonSerializer<Record> {
-		@Override
-		public void serialize(Record record, JsonGenerator jgen,
-				SerializerProvider provider) throws IOException,
-				JsonProcessingException {
-			jgen.writeStartObject();
-			for (Field field : record.getSchema().getFields()) {
-				String fieldName = field.name();
+    public static class RecordSerializer extends JsonSerializer<Record> {
+        @Override
+        public void serialize(Record record, JsonGenerator jgen,
+                SerializerProvider provider) throws IOException,
+                JsonProcessingException {
+            jgen.writeStartObject();
+            for (Field field : record.getSchema().getFields()) {
+                String fieldName = field.name();
 
-				Object value = record.get(fieldName);
-				if (value != null && value instanceof Utf8) {
-					jgen.writeObjectField(fieldName, value.toString());
-				} else {
-					jgen.writeObjectField(fieldName, value);
-				}
-			}
-			jgen.writeEndObject();
-		}
-	}
+                Object value = record.get(fieldName);
+                if (value != null && value instanceof Utf8) {
+                    jgen.writeObjectField(fieldName, value.toString());
+                } else {
+                    jgen.writeObjectField(fieldName, value);
+                }
+            }
+            jgen.writeEndObject();
+        }
+    }
 }

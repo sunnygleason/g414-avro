@@ -33,37 +33,37 @@ import com.g414.avro.process.RecordHandler;
  * be thread-safe.
  */
 public class JsonWriter implements RecordHandler {
-	protected final ObjectMapper mapper = AvroObjectMapper.getObjectMapper();
-	protected final PrintWriter writer;
+    protected final ObjectMapper mapper = AvroObjectMapper.getObjectMapper();
+    protected final PrintWriter writer;
 
-	/**
-	 * Construct an instance that writes to the specified writer using the
-	 * specified delimiter.
-	 */
-	public JsonWriter(PrintWriter writer) {
-		this.writer = writer;
-	}
+    /**
+     * Construct an instance that writes to the specified writer using the
+     * specified delimiter.
+     */
+    public JsonWriter(PrintWriter writer) {
+        this.writer = writer;
+    }
 
-	/** @see DelimitedTextFileWriter#start() */
-	@Override
-	public void start() {
-	}
+    /** @see DelimitedTextFileWriter#start() */
+    @Override
+    public void start() {
+    }
 
-	/** @see DelimitedTextFileWriter#handle(GenericRecord) */
-	@Override
-	public void handle(GenericRecord record) throws ProcessingException {
-		try {
-			StringWriter strWriter = new StringWriter();
-			mapper.writeValue(strWriter, record);
-			writer.println(strWriter.toString());
-		} catch (Exception e) {
-			throw new ProcessingException(e);
-		}
-	}
+    /** @see DelimitedTextFileWriter#handle(GenericRecord) */
+    @Override
+    public void handle(GenericRecord record) throws ProcessingException {
+        try {
+            StringWriter strWriter = new StringWriter();
+            mapper.writeValue(strWriter, record);
+            writer.println(strWriter.toString());
+        } catch (Exception e) {
+            throw new ProcessingException(e);
+        }
+    }
 
-	/** @see DelimitedTextFileWriter#finish() */
-	@Override
-	public void finish() {
-		writer.close();
-	}
+    /** @see DelimitedTextFileWriter#finish() */
+    @Override
+    public void finish() {
+        writer.close();
+    }
 }

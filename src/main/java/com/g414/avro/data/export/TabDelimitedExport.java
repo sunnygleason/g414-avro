@@ -33,32 +33,32 @@ import com.g414.avro.process.RecordProcessor;
 import com.g414.avro.process.handler.DelimitedTextFileWriter;
 
 public class TabDelimitedExport {
-	public static void main(String[] args) {
-		LinkedList<String> theArgs = new LinkedList<String>();
-		theArgs.addAll(Arrays.asList(args));
-		Schema schema = null;
+    public static void main(String[] args) {
+        LinkedList<String> theArgs = new LinkedList<String>();
+        theArgs.addAll(Arrays.asList(args));
+        Schema schema = null;
 
-		String schemaName = theArgs.removeFirst();
-		try {
-			schema = Schema.parse(new File(schemaName));
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.err.println("Error reading schema : " + schemaName);
-			System.exit(0);
-		}
+        String schemaName = theArgs.removeFirst();
+        try {
+            schema = Schema.parse(new File(schemaName));
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error reading schema : " + schemaName);
+            System.exit(0);
+        }
 
-		for (String file : theArgs) {
-			try {
-				PrintWriter writer = new PrintWriter(file + ".out.tsv");
-				RecordProcessor<GenericRecord> processor = new RecordProcessor<GenericRecord>(
-						schema, null, new DelimitedTextFileWriter(writer, "\t"));
-				processor.process(new SequentialDataReader<GenericRecord>(
-						schema, new FileInputStream(file),
-						new GenericDatumReader<GenericRecord>(schema)));
-				// close file...
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
+        for (String file : theArgs) {
+            try {
+                PrintWriter writer = new PrintWriter(file + ".out.tsv");
+                RecordProcessor<GenericRecord> processor = new RecordProcessor<GenericRecord>(
+                        schema, null, new DelimitedTextFileWriter(writer, "\t"));
+                processor.process(new SequentialDataReader<GenericRecord>(
+                        schema, new FileInputStream(file),
+                        new GenericDatumReader<GenericRecord>(schema)));
+                // close file...
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

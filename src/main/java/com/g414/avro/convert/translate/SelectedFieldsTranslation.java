@@ -32,33 +32,33 @@ import com.g414.avro.convert.RecordTranslation;
  * a specified translation map.
  */
 public class SelectedFieldsTranslation implements RecordTranslation {
-	/** schema to use */
-	protected final Schema schema;
+    /** schema to use */
+    protected final Schema schema;
 
-	/** map of in field names to out field names */
-	protected final Map<String, String> fieldMap;
+    /** map of in field names to out field names */
+    protected final Map<String, String> fieldMap;
 
-	/**
-	 * Constructs a new instance using the specified schema and map of in field
-	 * names to out field names.
-	 */
-	public SelectedFieldsTranslation(Schema schema, Map<String, String> fieldMap) {
-		this.schema = schema;
+    /**
+     * Constructs a new instance using the specified schema and map of in field
+     * names to out field names.
+     */
+    public SelectedFieldsTranslation(Schema schema, Map<String, String> fieldMap) {
+        this.schema = schema;
 
-		Map<String, String> theFields = new LinkedHashMap<String, String>();
-		theFields.putAll(fieldMap);
-		this.fieldMap = Collections.unmodifiableMap(theFields);
-	}
+        Map<String, String> theFields = new LinkedHashMap<String, String>();
+        theFields.putAll(fieldMap);
+        this.fieldMap = Collections.unmodifiableMap(theFields);
+    }
 
-	/** @see RecordTranslation#translate() */
-	@Override
-	public GenericRecord translate(GenericRecord in) {
-		Record record = new Record(schema);
+    /** @see RecordTranslation#translate() */
+    @Override
+    public GenericRecord translate(GenericRecord in) {
+        Record record = new Record(schema);
 
-		for (Map.Entry<String, String> entry : fieldMap.entrySet()) {
-			record.put(entry.getValue(), in.get(entry.getKey()));
-		}
+        for (Map.Entry<String, String> entry : fieldMap.entrySet()) {
+            record.put(entry.getValue(), in.get(entry.getKey()));
+        }
 
-		return record;
-	}
+        return record;
+    }
 }

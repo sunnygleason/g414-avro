@@ -23,6 +23,6 @@ package com.g414.avro.file;
  * DataIndexer class.
  */
 public interface Tell {
-	/** returns the last position read */
-	public long lastPos();
+    /** returns the last position read */
+    public long lastPos();
 }

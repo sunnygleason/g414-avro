@@ -27,25 +27,25 @@ import com.g414.avro.convert.RecordTranslation;
  * A RecordTranslation that does not modify records, just copies them.
  */
 public class IdentityTranslation implements RecordTranslation {
-	/** schema to use */
-	protected final Schema schema;
+    /** schema to use */
+    protected final Schema schema;
 
-	/** Constructs a new instance using the specified schema */
-	public IdentityTranslation(Schema schema) {
-		this.schema = schema;
-	}
+    /** Constructs a new instance using the specified schema */
+    public IdentityTranslation(Schema schema) {
+        this.schema = schema;
+    }
 
-	/** @see RecordTranslation#translate() */
-	@Override
-	public GenericRecord translate(GenericRecord in) {
-		int size = in.getSchema().getFields().size();
+    /** @see RecordTranslation#translate() */
+    @Override
+    public GenericRecord translate(GenericRecord in) {
+        int size = in.getSchema().getFields().size();
 
-		Record record = new Record(schema);
+        Record record = new Record(schema);
 
-		for (int i = 0; i < size; i++) {
-			record.put(i, in.get(i));
-		}
+        for (int i = 0; i < size; i++) {
+            record.put(i, in.get(i));
+        }
 
-		return record;
-	}
+        return record;
+    }
 }

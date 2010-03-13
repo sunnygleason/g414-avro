@@ -31,42 +31,42 @@ import com.g414.avro.process.RecordHandler;
  * thread-safe as writing to the writer is not known to be thread-safe.
  */
 public class DelimitedTextFileWriter implements RecordHandler {
-	protected final PrintWriter writer;
-	protected final String delim;
+    protected final PrintWriter writer;
+    protected final String delim;
 
-	/**
-	 * Construct an instance that writes to the specified writer using the
-	 * specified delimiter.
-	 */
-	public DelimitedTextFileWriter(PrintWriter writer, String delim) {
-		this.writer = writer;
-		this.delim = delim;
-	}
+    /**
+     * Construct an instance that writes to the specified writer using the
+     * specified delimiter.
+     */
+    public DelimitedTextFileWriter(PrintWriter writer, String delim) {
+        this.writer = writer;
+        this.delim = delim;
+    }
 
-	/** @see DelimitedTextFileWriter#start() */
-	@Override
-	public void start() {
-	}
+    /** @see DelimitedTextFileWriter#start() */
+    @Override
+    public void start() {
+    }
 
-	/** @see DelimitedTextFileWriter#handle(GenericRecord) */
-	@Override
-	public void handle(GenericRecord record) throws ProcessingException {
-		int size = record.getSchema().getFields().size();
+    /** @see DelimitedTextFileWriter#handle(GenericRecord) */
+    @Override
+    public void handle(GenericRecord record) throws ProcessingException {
+        int size = record.getSchema().getFields().size();
 
-		StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
 
-		for (int i = 0; i < size; i++) {
-			builder.append(delim);
-			builder.append(record.get(i).toString());
-		}
+        for (int i = 0; i < size; i++) {
+            builder.append(delim);
+            builder.append(record.get(i).toString());
+        }
 
-		String outStr = (size > 0) ? builder.substring(1) : "";
-		writer.println(outStr);
-	}
+        String outStr = (size > 0) ? builder.substring(1) : "";
+        writer.println(outStr);
+    }
 
-	/** @see DelimitedTextFileWriter#finish() */
-	@Override
-	public void finish() {
-		writer.close();
-	}
+    /** @see DelimitedTextFileWriter#finish() */
+    @Override
+    public void finish() {
+        writer.close();
+    }
 }

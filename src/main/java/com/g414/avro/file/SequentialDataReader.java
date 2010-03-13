@@ -40,105 +40,105 @@ import com.g414.avro.process.ProcessingException;
  * @see org.apache.avro.file.DataFileReader
  */
 public class SequentialDataReader<D> implements Tell {
-	protected DatumReader<D> reader;
-	protected PositionFilter in;
-	protected Decoder vin;
+    protected DatumReader<D> reader;
+    protected PositionFilter in;
+    protected Decoder vin;
 
-	protected long lastPos = 0;
-	protected long blockCount; // # entries in block
-	protected byte[] sync;
-	protected byte[] syncBuffer = new byte[DataFileConstants.SYNC_SIZE];
+    protected long lastPos = 0;
+    protected long blockCount; // # entries in block
+    protected byte[] sync;
+    protected byte[] syncBuffer = new byte[DataFileConstants.SYNC_SIZE];
 
-	/** Construct a reader for a file. */
-	public SequentialDataReader(Schema schema, InputStream sin,
-			DatumReader<D> reader) throws ProcessingException {
-		try {
-			this.in = new PositionFilter(sin);
-			byte[] magic = new byte[4];
-			in.read(magic);
-			if (!Arrays.equals(DataFileConstants.MAGIC, magic))
-				throw new IOException("Not a data file.");
+    /** Construct a reader for a file. */
+    public SequentialDataReader(Schema schema, InputStream sin,
+            DatumReader<D> reader) throws ProcessingException {
+        try {
+            this.in = new PositionFilter(sin);
+            byte[] magic = new byte[4];
+            in.read(magic);
+            if (!Arrays.equals(DataFileConstants.MAGIC, magic))
+                throw new IOException("Not a data file.");
 
-			this.reader = reader;
-			reader.setSchema(schema);
+            this.reader = reader;
+            reader.setSchema(schema);
 
-			this.vin = new BinaryDecoder(in);
-		} catch (IOException e) {
-			throw new ProcessingException("Exception while creating reader: "
-					+ e.getMessage(), e);
-		}
-	}
+            this.vin = new BinaryDecoder(in);
+        } catch (IOException e) {
+            throw new ProcessingException("Exception while creating reader: "
+                    + e.getMessage(), e);
+        }
+    }
 
-	/** Return the next datum in the file. */
-	public synchronized D next(D reuse) throws ProcessingException {
-		try {
-			while (blockCount == 0) { // at start of block
-				skipSync(); // skip a sync
-				blockCount = vin.readLong(); // read blockCount
-				if (blockCount == DataFileConstants.FOOTER_BLOCK) {
-					return null;
-				}
-			}
-			blockCount--;
-			lastPos = in.tell();
-			return reader.read(reuse, vin);
-		} catch (IOException e) {
-			throw new ProcessingException("Exception while reading input: "
-					+ e.getMessage(), e);
-		}
-	}
+    /** Return the next datum in the file. */
+    public synchronized D next(D reuse) throws ProcessingException {
+        try {
+            while (blockCount == 0) { // at start of block
+                skipSync(); // skip a sync
+                blockCount = vin.readLong(); // read blockCount
+                if (blockCount == DataFileConstants.FOOTER_BLOCK) {
+                    return null;
+                }
+            }
+            blockCount--;
+            lastPos = in.tell();
+            return reader.read(reuse, vin);
+        } catch (IOException e) {
+            throw new ProcessingException("Exception while reading input: "
+                    + e.getMessage(), e);
+        }
+    }
 
-	/** return the start position of the last record returned */
-	public synchronized long lastPos() {
-		return this.lastPos;
-	}
+    /** return the start position of the last record returned */
+    public synchronized long lastPos() {
+        return this.lastPos;
+    }
 
-	/** Close this reader. */
-	public synchronized void close() throws IOException {
-		in.close();
-	}
+    /** Close this reader. */
+    public synchronized void close() throws IOException {
+        in.close();
+    }
 
-	/** skips a synchronization block */
-	protected void skipSync() throws IOException {
-		vin.readFixed(syncBuffer);
-		if (sync == null) {
-			sync = new byte[DataFileConstants.SYNC_SIZE];
-			System.arraycopy(syncBuffer, 0, sync, 0, syncBuffer.length);
-		}
+    /** skips a synchronization block */
+    protected void skipSync() throws IOException {
+        vin.readFixed(syncBuffer);
+        if (sync == null) {
+            sync = new byte[DataFileConstants.SYNC_SIZE];
+            System.arraycopy(syncBuffer, 0, sync, 0, syncBuffer.length);
+        }
 
-		if (!Arrays.equals(syncBuffer, sync)) {
-			throw new RuntimeException("Invalid Sync!");
-		}
-	}
+        if (!Arrays.equals(syncBuffer, sync)) {
+            throw new RuntimeException("Invalid Sync!");
+        }
+    }
 
-	/** Utility class for implementing Tell */
-	protected static class PositionFilter extends InputStream {
-		private InputStream in;
-		private long position;
+    /** Utility class for implementing Tell */
+    protected static class PositionFilter extends InputStream {
+        private InputStream in;
+        private long position;
 
-		public PositionFilter(InputStream in) throws IOException {
-			this.in = in;
-		}
+        public PositionFilter(InputStream in) throws IOException {
+            this.in = in;
+        }
 
-		public int read() throws IOException {
-			int value = in.read();
-			if (value != -1) {
-				position += 1;
-			}
+        public int read() throws IOException {
+            int value = in.read();
+            if (value != -1) {
+                position += 1;
+            }
 
-			return value;
-		}
+            return value;
+        }
 
-		public int read(byte[] b, int off, int len) throws IOException {
-			int value = in.read(b, off, len);
-			if (value > 0) {
-				position += value;
-			}
-			return value;
-		}
+        public int read(byte[] b, int off, int len) throws IOException {
+            int value = in.read(b, off, len);
+            if (value > 0) {
+                position += value;
+            }
+            return value;
+        }
 
-		public long tell() {
-			return this.position;
-		}
-	}
+        public long tell() {
+            return this.position;
+        }
+    }
 }

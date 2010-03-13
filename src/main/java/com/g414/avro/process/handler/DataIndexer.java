@@ -34,54 +34,54 @@ import com.g414.avro.process.RecordHandler;
  * is not synchronized.
  */
 public class DataIndexer implements RecordHandler {
-	/** Tell to use as source of record positions */
-	protected Tell reader;
+    /** Tell to use as source of record positions */
+    protected Tell reader;
 
-	/** destination output stream */
-	protected final OutputStream out;
+    /** destination output stream */
+    protected final OutputStream out;
 
-	/** byte array to use for marshalling longs */
-	protected final byte[] longBytes = new byte[8];
+    /** byte array to use for marshalling longs */
+    protected final byte[] longBytes = new byte[8];
 
-	/** LongBuffer to use for marshalling longs */
-	protected final LongBuffer longBuf = ByteBuffer.wrap(longBytes)
-			.asLongBuffer();
+    /** LongBuffer to use for marshalling longs */
+    protected final LongBuffer longBuf = ByteBuffer.wrap(longBytes)
+            .asLongBuffer();
 
-	/**
-	 * Create a new instance that reads from the specified reader and writes to
-	 * the specified output stream.
-	 */
-	public DataIndexer(Tell reader, OutputStream out) {
-		this.reader = reader;
-		this.out = out;
-	}
+    /**
+     * Create a new instance that reads from the specified reader and writes to
+     * the specified output stream.
+     */
+    public DataIndexer(Tell reader, OutputStream out) {
+        this.reader = reader;
+        this.out = out;
+    }
 
-	/** @see RecordHandler#start() */
-	@Override
-	public void start() {
-	}
+    /** @see RecordHandler#start() */
+    @Override
+    public void start() {
+    }
 
-	/** @see RecordHandler#handle(GenericRecord) */
-	@Override
-	public void handle(GenericRecord record) throws ProcessingException {
-		long pos = reader.lastPos();
-		longBuf.put(pos);
-		longBuf.rewind();
+    /** @see RecordHandler#handle(GenericRecord) */
+    @Override
+    public void handle(GenericRecord record) throws ProcessingException {
+        long pos = reader.lastPos();
+        longBuf.put(pos);
+        longBuf.rewind();
 
-		try {
-			out.write(longBytes);
-		} catch (IOException e) {
-			throw new ProcessingException("Error while writing index: "
-					+ e.getMessage(), e);
-		}
-	}
+        try {
+            out.write(longBytes);
+        } catch (IOException e) {
+            throw new ProcessingException("Error while writing index: "
+                    + e.getMessage(), e);
+        }
+    }
 
-	/** @see RecordHandler#finish() */
-	@Override
-	public void finish() {
-		try {
-			out.close();
-		} catch (IOException ignored) {
-		}
-	}
+    /** @see RecordHandler#finish() */
+    @Override
+    public void finish() {
+        try {
+            out.close();
+        } catch (IOException ignored) {
+        }
+    }
 }

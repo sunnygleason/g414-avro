@@ -35,37 +35,37 @@ import com.g414.avro.process.RecordProcessor;
 import com.g414.avro.process.handler.JsonWriter;
 
 public class JsonExport {
-	public static void main(String[] args) {
-		LinkedList<String> theArgs = new LinkedList<String>();
-		theArgs.addAll(Arrays.asList(args));
-		Schema schema = null;
+    public static void main(String[] args) {
+        LinkedList<String> theArgs = new LinkedList<String>();
+        theArgs.addAll(Arrays.asList(args));
+        Schema schema = null;
 
-		String schemaName = theArgs.removeFirst();
-		try {
-			schema = Schema.parse(new File(schemaName));
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.err.println("Error reading schema : " + schemaName);
-			System.exit(0);
-		}
+        String schemaName = theArgs.removeFirst();
+        try {
+            schema = Schema.parse(new File(schemaName));
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error reading schema : " + schemaName);
+            System.exit(0);
+        }
 
-		for (String file : theArgs) {
-			try {
-				InputStream input = new FileInputStream(file);
-				if (file.endsWith(".gz")) {
-					input = new GZIPInputStream(input);
-				}
+        for (String file : theArgs) {
+            try {
+                InputStream input = new FileInputStream(file);
+                if (file.endsWith(".gz")) {
+                    input = new GZIPInputStream(input);
+                }
 
-				PrintWriter writer = new PrintWriter(file + ".out.json");
-				RecordProcessor<GenericRecord> processor = new RecordProcessor<GenericRecord>(
-						schema, null, new JsonWriter(writer));
-				processor.process(new SequentialDataReader<GenericRecord>(
-						schema, input, new GenericDatumReader<GenericRecord>(
-								schema)));
-				// close file...
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
+                PrintWriter writer = new PrintWriter(file + ".out.json");
+                RecordProcessor<GenericRecord> processor = new RecordProcessor<GenericRecord>(
+                        schema, null, new JsonWriter(writer));
+                processor.process(new SequentialDataReader<GenericRecord>(
+                        schema, input, new GenericDatumReader<GenericRecord>(
+                                schema)));
+                // close file...
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

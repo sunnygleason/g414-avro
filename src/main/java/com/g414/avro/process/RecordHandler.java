@@ -24,20 +24,20 @@ import org.apache.avro.generic.GenericRecord;
  * stateful and update state as new records are handled.
  */
 public interface RecordHandler {
-	/**
-	 * Called by the RecordProcessor to inform this instance that processing is
-	 * about to begin.
-	 */
-	public void start();
+    /**
+     * Called by the RecordProcessor to inform this instance that processing is
+     * about to begin.
+     */
+    public void start();
 
-	/**
-	 * Process a single record.
-	 */
-	public void handle(GenericRecord record) throws ProcessingException;
+    /**
+     * Process a single record.
+     */
+    public void handle(GenericRecord record) throws ProcessingException;
 
-	/**
-	 * Called by the RecordProcessor to inform this instance that processing has
-	 * completed.
-	 */
-	public void finish();
+    /**
+     * Called by the RecordProcessor to inform this instance that processing has
+     * completed.
+     */
+    public void finish();
 }

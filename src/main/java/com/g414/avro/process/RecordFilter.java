@@ -24,6 +24,6 @@ import org.apache.avro.generic.GenericRecord;
  * RecordProcessor instance (for example).
  */
 public interface RecordFilter {
-	/** Returns true if the filter matches the record, false otherwise. */
-	public boolean matches(GenericRecord record);
+    /** Returns true if the filter matches the record, false otherwise. */
+    public boolean matches(GenericRecord record);
 }
